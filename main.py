@@ -1,31 +1,26 @@
-# This is a sample Python script.
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+from laba_1.graph_3d import build_3d_graph_swen
+from laba_1.math_part import laba_1
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
-    x = np.linspace(-5, 5, 100)
-    y = np.linspace(-5, 5, 100)
-    X, Y = np.meshgrid(x, y)
-    Z = np.sin(np.sqrt(X ** 2 + Y ** 2))
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.plot_surface(X, Y, Z, cmap='viridis')
-
-    plt.show()
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    laba = None
+    func = input("input the function or press enter to use default values: ")
+    if func:
+        x0 = float(input("input x0 value: "))
+        h = float(input("input x0 value: "))
+        laba = laba_1(func, x0, h)
+    else:
+        laba = laba_1()
+    n = input("input max number of iterations: ")
+    if n:
+        laba.swen_method(int(n))
+    else:
+        laba.swen_method()
+    build_3d_graph_swen(laba.x_arr, laba.fx_arr, (laba.a, laba.fa), (laba.b, laba.fb),
+                        (laba.c, laba.fc), laba.func, laba.func_str)
