@@ -1,4 +1,3 @@
-from laba_1.graph_3d import build_3d_graph_swen
 from laba_1.math_part import laba_1
 
 
