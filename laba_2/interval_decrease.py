@@ -45,7 +45,7 @@ class IntervalDecrease:
     def get_val(self, x):
         return self.func(x)
 
-    def dichotomy(self, a, b, shift, tol):
+    def dichotomy(self, a: float, b: float, shift: float, tol: float) -> tuple[float, float]:
         self.n_final = -1
         self.all_x = []
         self.all_fx = []
@@ -59,8 +59,9 @@ class IntervalDecrease:
                 b = v
             else:
                 a = u
+
             if not b - a > tol:
-                return
+                return a, b
 
 
     def binary(self, a, b, tol):
@@ -154,12 +155,13 @@ if __name__ == "__main__":
     cl = IntervalDecrease()
     cl.find_a_b()
     print(f'{cl.a=} , {cl.b=}')
-    cl.dichotomy(cl.a, cl.b, 0.001, 0.01)
+    res = cl.dichotomy(cl.a, cl.b, 0.001, 0.01)
     # cl.binary(cl.a, cl.b, 0.05)
     # cl.gold(cl.a, cl.b, 0.05)
     # cl.corop(cl.x0, cl.h, 0.05)
 
     print(cl.all_x)
     print(cl.all_fx)
-    print(f'{cl.a=}, {cl.b=}')
+    # print(f'{cl.a=}, {cl.b=}')
+    print(res)
     cl.show()
