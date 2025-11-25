@@ -14,10 +14,15 @@ class Koshi:
         f_sym = sp.sympify(self.func_str)
         f_lambda_base = sp.lambdify(symbols_list, f_sym, 'numpy')
 
-        def func_wrapper(x_vec: np.ndarray):
+        def func_wrapper(x_vec: np.ndarray) -> float:
             return f_lambda_base(*x_vec)
 
         return func_wrapper
+
+    def get_val(self, x_vect: np.ndarray) -> float:
+        return self.func(x_vect)
+
+
 
     def calculate_gradient(self, x_vec: np.ndarray, delta: float = 1e-6) -> np.ndarray:
         g_vec = np.zeros(self.dim)
@@ -29,4 +34,32 @@ class Koshi:
             g_vec[i] = (fy_val - fx_val)/delta
             y_vec[i] = x_vec[i]
         return g_vec
+
+    def corop_line(self, x: float, h: float, tol: float) -> tuple[float, float]:
+        r = 0
+        fx = self.get_val(x)
+        while True and self.n_final < self.n_max:
+            y = x + h
+            fy = self.get_val(y)
+            if fy >= fx:
+                if r == 2:
+                    r = 0.25
+                else:
+                    r = - 0.5
+            else:
+                x = y
+                fx = fy
+                if r >= 0.5:
+                    r = 2
+                else:
+                    r = 0.5
+            h = h * r
+            print(f'uncertainty interval = {h}')
+            if not abs(h) > tol:
+                y = x + h
+                fy = self.get_val(y)
+                print(" - final check")
+                if fy < fx:
+                    return y, fy
+                return x, fx
 
