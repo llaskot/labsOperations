@@ -18,6 +18,7 @@ def lab_1():
         laba.swen.swen_method()
     laba.final_print()
     laba.show_graph()
+    return
 
 
 def lab_2():

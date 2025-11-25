@@ -1,7 +1,5 @@
 from math import sqrt
-
 import sympy as sp
-
 from laba_1.graph_3d import build_3d_decreasing
 from laba_1.swen_class import Swen
 
@@ -220,30 +218,30 @@ class IntervalDecrease:
 
 
 
-if __name__ == "__main__":
-    cl = IntervalDecrease()
-    # cl.find_a_b()
-    # print(f'{cl.a=} , {cl.b=}')
-    # res = cl.dichotomy(cl.a, cl.b, 0.0001, 0.001)
-    # res = cl.binary(cl.a, cl.b, 0.001)
-    res = cl.gold(cl.a, cl.b, 0.001)
-    # res = cl.corop(cl.x0, cl.h, 0.001)
-
-    print(cl.all_x)
-    print(cl.all_fx)
-    print(f'{cl.a=}, {cl.b=}')
-    print(res)
-    cl.show_graph()
-    x_extr, derivative_1, derivative_2 = cl.find_analytical_extremum()
-    print(f"\nExtremum: x* = {x_extr}, f(x*) = {cl.func(x_extr)}")
-
-    # res = cl.gold(cl.a, cl.b, 0.001)
-    res = cl.corop(cl.x0, cl.h, 0.001)
-
-    print(cl.all_x)
-    print(cl.all_fx)
-    print(f'{cl.a=}, {cl.b=}')
-    print(res)
-    cl.show_graph()
-    # x_extr, derivative_1, derivative_2 = cl.find_analytical_extremum()
-    # print(f"\nExtremum: x* = {x_extr}, f(x*) = {cl.func(x_extr)}")
+# if __name__ == "__main__":
+#     cl = IntervalDecrease()
+#     # cl.find_a_b()
+#     # print(f'{cl.a=} , {cl.b=}')
+#     # res = cl.dichotomy(cl.a, cl.b, 0.0001, 0.001)
+#     # res = cl.binary(cl.a, cl.b, 0.001)
+#     res = cl.gold(cl.a, cl.b, 0.001)
+#     # res = cl.corop(cl.x0, cl.h, 0.001)
+#
+#     print(cl.all_x)
+#     print(cl.all_fx)
+#     print(f'{cl.a=}, {cl.b=}')
+#     print(res)
+#     cl.show_graph()
+#     x_extr, derivative_1, derivative_2 = cl.find_analytical_extremum()
+#     print(f"\nExtremum: x* = {x_extr}, f(x*) = {cl.func(x_extr)}")
+#
+#     # res = cl.gold(cl.a, cl.b, 0.001)
+#     res = cl.corop(cl.x0, cl.h, 0.001)
+#
+#     print(cl.all_x)
+#     print(cl.all_fx)
+#     print(f'{cl.a=}, {cl.b=}')
+#     print(res)
+#     cl.show_graph()
+#     # x_extr, derivative_1, derivative_2 = cl.find_analytical_extremum()
+#     # print(f"\nExtremum: x* = {x_extr}, f(x*) = {cl.func(x_extr)}")

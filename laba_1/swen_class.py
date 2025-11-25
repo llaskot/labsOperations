@@ -47,8 +47,7 @@ class Swen:
 
         return inner
 
-    # def _iteration_print(self, x, y):
-    #     print(f'point # {self.n_final}, cur step = {self.h_final}, x{self.n_final} = {x},  f(x{self.n_final}) = {y}')
+
 
     @staticmethod
     def iteration_print(func):
