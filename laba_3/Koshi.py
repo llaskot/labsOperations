@@ -4,8 +4,7 @@ import sympy as sp
 import numpy as np
 from matplotlib import pyplot as plt
 
-
-from laba_1.graph_3d import  plot_3d_surface_with_path
+from laba_1.graph_3d import plot_3d_surface_with_path
 
 
 class Koshi:
@@ -320,6 +319,51 @@ class Koshi:
                     fx = fy
                 return x
 
+    def newthon(self, x0: tuple, tol: float):
+        x_vec = np.array(x0)
+        result = []
+        result_func = []
+        k = 0
+        while k < self.n_max:
+            k += 1
+            result.append(x_vec)
+            result_func.append(self.get_val(x_vec))
+            g_vec = self.calculate_gradient(x_vec)
+
+            # r = self.corop_line(x_vec, g_vec, tol * 10)
+            self.swen_method(g_vec, x_vec, 0.01)
+            # r = self.binary(self.a, self.b, g_vec, x_vec, tol * 10)
+            # r = self.dichotomy(self.a, self.b, g_vec, x_vec, tol * 10)
+            r = self.gold(self.a, self.b, g_vec, x_vec, tol * 10)
+
+            print(f"{r=}")
+            s = -r * g_vec
+            x_vec = x_vec + s
+            print("s scalar = ", np.linalg.norm(s))
+            print("\n\n")
+            if np.linalg.norm(s) <= tol:
+                return result, result_func
+        return result, result_func
+
+    def calculate_gradient_central(self, x_vec: np.ndarray, delta: float = 1e-6) -> np.ndarray:
+        g_vec = np.zeros(self.dim)
+
+        for i in range(self.dim):
+            x_plus = x_vec.copy()
+            x_minus = x_vec.copy()
+
+            # 1. Считаем f(x + delta*e_i)
+            x_plus[i] += delta
+            fy_val = self.func(x_plus)
+
+            # 2. Считаем f(x - delta*e_i)
+            x_minus[i] -= delta
+            fz_val = self.func(x_minus)
+
+            # 3. Применяем формулу центральных разностей
+            g_vec[i] = (fy_val - fz_val) / (2 * delta)
+        return g_vec
+
 
 if __name__ == "__main__":
     f = Koshi()
@@ -330,7 +374,6 @@ if __name__ == "__main__":
 
     # res = f.polocoribyer((-2.8, 8), 0.0000001)
     # res = f.fl_rivs((-2.8, 8), 0.0000001)
-
 
     # print(res[0])
     # print(res[1])
@@ -355,4 +398,3 @@ if __name__ == "__main__":
             plt.close(fig)
             print("Ресурсы графика Matplotlib гарантированно освобождены.")
     plt.close('all')
-
