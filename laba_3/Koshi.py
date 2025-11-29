@@ -10,8 +10,8 @@ from laba_1.graph_3d import plot_3d_surface_with_path
 class Koshi:
     # def __init__(self, func_str: str = "4*x_1**2 + x_2**2", dim: int = 2, n_max: int = 300):
 
-    def __init__(self, func_str: str = "(1 - x_1)**2 + 100*(x_2 - x_1**2)**2", dim: int = 2, n_max: int = 5000):
-    # def __init__(self, func_str: str = "x_1**2 + (x_2 - 2)**2", dim: int = 2, n_max: int = 5000):
+    # def __init__(self, func_str: str = "(1 - x_1)**2 + 100*(x_2 - x_1**2)**2", dim: int = 2, n_max: int = 5000):
+    def __init__(self, func_str: str = "x_1**2 + (x_2 - 2)**2", dim: int = 2, n_max: int = 5000):
 
         self.fc = None
         self.fb = None
@@ -69,16 +69,16 @@ class Koshi:
         cur_step += 1
         fb = self.get_val(y(b))
         if fb >= fc:
-            self.a, self.b, = c, b
-            self.fa, self.fb = fc, fb
-            # a = c - h
-            # cur_step += 1
-            # fa = self.get_val(y(a))
-            # if fa >= fc:
-            #     self.a, self.b, self.c = a, b, c
-            #     self.fa, self.fb, self.fc = fa, fb, fc
-            # else:
-            #     self._swen_inc(b, fb, c, fc, h, max_steps, cur_step, y)
+            # self.a, self.b, = c, b
+            # self.fa, self.fb = fc, fb
+            a = c - h
+            cur_step += 1
+            fa = self.get_val(y(a))
+            if fa >= fc:
+                self.a, self.b, self.c = a, b, c
+                self.fa, self.fb, self.fc = fa, fb, fc
+            else:
+                self._swen_inc(b, fb, c, fc, h, max_steps, cur_step, y)
         else:
             self._swen_dec(c, fc, b, fb, h, max_steps, cur_step, y)
 
@@ -95,18 +95,18 @@ class Koshi:
                 self.fa, self.fb, self.fc = fa, fb, fc
                 return
 
-    # def _swen_inc(self, b, fb, c, fc, h, max_steps, cur_step, y):
-    #     while cur_step < max_steps:
-    #         h *= 2
-    #         a = c - h
-    #         cur_step += 1
-    #         fa = self.get_val(y(a))
-    #         if fa >= fc:
-    #             self.a, self.b, self.c = a, b, c
-    #             self.fa, self.fb, self.fc = fa, fb, fc
-    #             return
-    #         else:
-    #             b, fb, c, fc = c, fc, a, fa
+    def _swen_inc(self, b, fb, c, fc, h, max_steps, cur_step, y):
+        while cur_step < max_steps:
+            h *= 2
+            a = c - h
+            cur_step += 1
+            fa = self.get_val(y(a))
+            if fa >= fc:
+                self.a, self.b, self.c = a, b, c
+                self.fa, self.fb, self.fc = fa, fb, fc
+                return
+            else:
+                b, fb, c, fc = c, fc, a, fa
 
     def corop_line(self, x0: np.ndarray, g_vec: np.ndarray, tol: float) -> float:
         cur_step = -1
@@ -161,8 +161,8 @@ class Koshi:
 
             # r = self.corop_line(x_vec, g_vec, tol * 10)
             self.swen_method(g_vec, x_vec, 0.01)
-            # r = self.binary(self.a, self.b, g_vec, x_vec, tol * 10)
-            r = self.dichotomy(self.a, self.b, g_vec, x_vec, tol * 10)
+            r = self.binary(self.a, self.b, g_vec, x_vec, tol * 10)
+            # r = self.dichotomy(self.a, self.b, g_vec, x_vec, tol * 10)
             # r = self.gold(self.a, self.b, g_vec, x_vec, tol * 10)
 
             print(f"{r=}")
@@ -187,9 +187,9 @@ class Koshi:
             result_func.append(self.get_val(x_vec))
             # r = self.corop_line(x_vec, -d_vec, tol * 10)
             self.swen_method(-d_vec, x_vec, 0.01)
-            r = self.binary(self.a, self.b, -d_vec, x_vec, tol * 10)
+            # r = self.binary(self.a, self.b, -d_vec, x_vec, tol * 10)
             # r = self.dichotomy(self.a, self.b, -d_vec, x_vec, tol * 10)
-            # r = self.gold(self.a, self.b, -d_vec, x_vec, tol * 10)
+            r = self.gold(self.a, self.b, -d_vec, x_vec, tol * 10)
 
             print(f"{r=}")
             s = r * d_vec
@@ -332,10 +332,10 @@ class Koshi:
             hessian = self.calculate_hessian(x_vec)
             d_vec = self.find_newton_direction(hessian, g_vec)
 
-            # r = self.corop_line(x_vec, g_vec, tol * 10)
+            # r = self.corop_line(x_vec, -d_vec, tol * 10)
             self.swen_method(-d_vec, x_vec, 0.01)
-            # r = self.binary(self.a, self.b, g_vec, x_vec, tol * 10)
-            # r = self.dichotomy(self.a, self.b, g_vec, x_vec, tol * 10)
+            # r = self.binary(self.a, self.b, -d_vec, x_vec, tol * 10)
+            # r = self.dichotomy(self.a, self.b, -d_vec, x_vec, tol * 10)
             r = self.gold(self.a, self.b, -d_vec, x_vec, tol * 10)
 
             print(f"{r=}")
@@ -432,23 +432,105 @@ class Koshi:
 
         return d
 
+    def nelder_mead(self, x0: tuple, tol: float, delta: float = 1):
+        x_vec = np.array(x0)
+        result = [x_vec]
+        result_func = [self.get_val(x_vec)]
+        x_figure: list[np.array] = [np.copy(x_vec)]
+        fx_figure: list[float] = [self.get_val(x_vec)]
+        k = 0
+        for d in range(self.dim):
+            k += 1
+            x_0 = np.copy(x_vec)
+            x_0[d] = x_vec[d] + delta
+            x_figure.append(x_0)
+            fx_figure.append(self.get_val(x_0))
+        while k < self.n_max:
+            k += 1
+            fw = max(fx_figure)
+            h = fx_figure.index(fw)
+            w = np.copy(x_figure[h])
+            fx = min(fx_figure)
+            l = fx_figure.index(fx)
+            x = np.copy(x_figure[l if l != h else l - 1])
+            result.append(x)
+            result_func.append(fx)
+
+            all_delta: list[float] = []
+            for apex in x_figure:
+                for d in range(self.dim):
+                    all_delta.append(abs(x[d] - apex[d]))
+            delta = max(all_delta)
+            if delta <= tol:
+                return result, result_func
+            sum_vectors = np.sum(x_figure, axis=0)
+            sum_vectors = sum_vectors - x_figure[h]
+            c_centroid = sum_vectors / self.dim
+            # x_figure.pop(h)
+            # fx_figure.pop(h)
+            # c_centroid = np.sum(x_figure, axis=0) / self.dim
+            y = 2 * c_centroid - w
+            fy = self.get_val(y)
+            if fy < fx:
+                z = 2 * y - c_centroid
+                fz = self.get_val(z)
+                if fz < fy:
+                    # x_figure.append(z)
+                    # fx_figure.append(fz)
+                    x_figure[h] = z
+                    fx_figure[h] = fz
+                else:
+                    # x_figure.append(y)
+                    # fx_figure.append(fy)
+                    x_figure[h] = y
+                    fx_figure[h] = fy
+                continue
+            is_replaced = False
+            for d in range(self.dim + 1):
+                if d != h and fy < fx_figure[d]:
+                    fx_figure[h] = fy
+                    x_figure[h] = y
+                    is_replaced = True
+                    break
+            if is_replaced:
+                continue
+            if fy < fw:
+                w = y
+                x_figure[h] = y
+                fw = fy
+                fx_figure[h] = fy
+                z = 0.5 * (w + c_centroid)
+                fz = self.get_val(z)
+                if fz < fw :
+                    x_figure[h] = z
+                    fx_figure[h] = fz
+                    continue
+            for d in range(self.dim + 1):
+                if d != l :
+                    x_figure[d] = 0.5*(x_figure[d] + x)
+                    fx_figure[d] = self.get_val(x_figure[d])
+            continue
+
+
+
 if __name__ == "__main__":
-    f = Koshi()
-    # res = f.quick_down((20, 20), 0.0000001)
-    # res = f.fl_rivs((20, 20), 0.0000001)
-    # res = f.polocoribyer((20, 20), 0.0000001)
-    # res = f.newthon((20, 20), 0.0000001)
+    # f = Koshi("0.1 * (12 + x_1**2 + (1 + x_2**2) / x_1**2 + ((x_1 * x_2)**2 + 100) / (x_1 * x_2)**4)")
+    # f = Koshi()
+    # f = Koshi(" (x_1 - 4)**2 + (x_2 - 4)**2 ")
+    # f = Koshi(" 100 * (x_2 - x_1**2)**2 + (1 - x_1)**2 ")
+    # f = Koshi(" (0.01 * (x_1 - 3))**2 - (x_2 - x_1) + exp(20 * (x_2 - x_1)) ")
+    f = Koshi(" 100 * (x_2 - x_1**3 + x_1)**2 + (x_1 - 1)**2 ")
 
+    res = f.quick_down((5, 20), 0.0000001)
+    # res = f.fl_rivs((1.5, 3), 0.0000001)
+    # res = f.polocoribyer((5, 70), 0.0000001)
+    # res = f.newthon((5, 70), 0.0000001)
+    # res = f.nelder_mead((5, 70), 0.0000001)
 
-    res = f.quick_down((-2.8, 8), 0.0000001)
-    # res = f.polocoribyer((-2.8, 8), 0.0000001)
-    # res = f.fl_rivs((-2.8, 8), 0.0000001)
+    # res = f.quick_down((-2.8, 8), 0.0000001)
+    # res = f.polocoribyer((-2.8, 8), 0.0001)
+    # res = f.fl_rivs((-2.8, 8), 0.000001)
     # res = f.newthon((-2.8, 8), 0.0000001)
-
-
-    # print(res[0])
-    # print(res[1])
-    # plot_3d_surface_with_path(f.func, res[0], res[1], True, 100000)
 
     fig = None  # Инициализируем переменную для графика
 
@@ -467,5 +549,4 @@ if __name__ == "__main__":
         # Этот код ГАРАНТИРОВАННО выполнится, даже при прерывании!
         if fig is not None:
             plt.close(fig)
-            print("Ресурсы графика Matplotlib гарантированно освобождены.")
     plt.close('all')
