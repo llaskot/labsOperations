@@ -10,8 +10,8 @@ from laba_1.graph_3d import plot_3d_surface_with_path
 class Koshi:
     # def __init__(self, func_str: str = "4*x_1**2 + x_2**2", dim: int = 2, n_max: int = 300):
 
-    # def __init__(self, func_str: str = "(1 - x_1)**2 + 100*(x_2 - x_1**2)**2", dim: int = 2, n_max: int = 5000):
-    def __init__(self, func_str: str = "x_1**2 + (x_2 - 2)**2", dim: int = 2, n_max: int = 5000):
+    def __init__(self, func_str: str = "(1 - x_1)**2 + 100*(x_2 - x_1**2)**2", dim: int = 2, n_max: int = 5000):
+    # def __init__(self, func_str: str = "x_1**2 + (x_2 - 2)**2", dim: int = 2, n_max: int = 5000):
 
         self.fc = None
         self.fb = None
@@ -71,14 +71,14 @@ class Koshi:
         if fb >= fc:
             self.a, self.b, = c, b
             self.fa, self.fb = fc, fb
-            a = c - h
-            cur_step += 1
-            fa = self.get_val(y(a))
-            if fa >= fc:
-                self.a, self.b, self.c = a, b, c
-                self.fa, self.fb, self.fc = fa, fb, fc
-            else:
-                self._swen_inc(b, fb, c, fc, h, max_steps, cur_step, y)
+            # a = c - h
+            # cur_step += 1
+            # fa = self.get_val(y(a))
+            # if fa >= fc:
+            #     self.a, self.b, self.c = a, b, c
+            #     self.fa, self.fb, self.fc = fa, fb, fc
+            # else:
+            #     self._swen_inc(b, fb, c, fc, h, max_steps, cur_step, y)
         else:
             self._swen_dec(c, fc, b, fb, h, max_steps, cur_step, y)
 
@@ -95,18 +95,18 @@ class Koshi:
                 self.fa, self.fb, self.fc = fa, fb, fc
                 return
 
-    def _swen_inc(self, b, fb, c, fc, h, max_steps, cur_step, y):
-        while cur_step < max_steps:
-            h *= 2
-            a = c - h
-            cur_step += 1
-            fa = self.get_val(y(a))
-            if fa >= fc:
-                self.a, self.b, self.c = a, b, c
-                self.fa, self.fb, self.fc = fa, fb, fc
-                return
-            else:
-                b, fb, c, fc = c, fc, a, fa
+    # def _swen_inc(self, b, fb, c, fc, h, max_steps, cur_step, y):
+    #     while cur_step < max_steps:
+    #         h *= 2
+    #         a = c - h
+    #         cur_step += 1
+    #         fa = self.get_val(y(a))
+    #         if fa >= fc:
+    #             self.a, self.b, self.c = a, b, c
+    #             self.fa, self.fb, self.fc = fa, fb, fc
+    #             return
+    #         else:
+    #             b, fb, c, fc = c, fc, a, fa
 
     def corop_line(self, x0: np.ndarray, g_vec: np.ndarray, tol: float) -> float:
         cur_step = -1
@@ -162,8 +162,8 @@ class Koshi:
             # r = self.corop_line(x_vec, g_vec, tol * 10)
             self.swen_method(g_vec, x_vec, 0.01)
             # r = self.binary(self.a, self.b, g_vec, x_vec, tol * 10)
-            # r = self.dichotomy(self.a, self.b, g_vec, x_vec, tol * 10)
-            r = self.gold(self.a, self.b, g_vec, x_vec, tol * 10)
+            r = self.dichotomy(self.a, self.b, g_vec, x_vec, tol * 10)
+            # r = self.gold(self.a, self.b, g_vec, x_vec, tol * 10)
 
             print(f"{r=}")
             s = -r * g_vec
@@ -185,9 +185,9 @@ class Koshi:
             k += 1
             result.append(x_vec)
             result_func.append(self.get_val(x_vec))
-            r = self.corop_line(x_vec, -d_vec, tol * 10)
-            # self.swen_method(-d_vec, x_vec, 0.01)
-            # r = self.binary(self.a, self.b, -d_vec, x_vec, tol * 10)
+            # r = self.corop_line(x_vec, -d_vec, tol * 10)
+            self.swen_method(-d_vec, x_vec, 0.01)
+            r = self.binary(self.a, self.b, -d_vec, x_vec, tol * 10)
             # r = self.dichotomy(self.a, self.b, -d_vec, x_vec, tol * 10)
             # r = self.gold(self.a, self.b, -d_vec, x_vec, tol * 10)
 
@@ -328,16 +328,18 @@ class Koshi:
             k += 1
             result.append(x_vec)
             result_func.append(self.get_val(x_vec))
-            g_vec = self.calculate_gradient(x_vec)
+            g_vec = self.calculate_gradient_central(x_vec)
+            hessian = self.calculate_hessian(x_vec)
+            d_vec = self.find_newton_direction(hessian, g_vec)
 
             # r = self.corop_line(x_vec, g_vec, tol * 10)
-            self.swen_method(g_vec, x_vec, 0.01)
+            self.swen_method(-d_vec, x_vec, 0.01)
             # r = self.binary(self.a, self.b, g_vec, x_vec, tol * 10)
             # r = self.dichotomy(self.a, self.b, g_vec, x_vec, tol * 10)
-            r = self.gold(self.a, self.b, g_vec, x_vec, tol * 10)
+            r = self.gold(self.a, self.b, -d_vec, x_vec, tol * 10)
 
             print(f"{r=}")
-            s = -r * g_vec
+            s = r * d_vec
             x_vec = x_vec + s
             print("s scalar = ", np.linalg.norm(s))
             print("\n\n")
@@ -354,26 +356,95 @@ class Koshi:
 
             # 1. Считаем f(x + delta*e_i)
             x_plus[i] += delta
-            fy_val = self.func(x_plus)
+            fy_val = self.get_val(x_plus)
 
             # 2. Считаем f(x - delta*e_i)
             x_minus[i] -= delta
-            fz_val = self.func(x_minus)
+            fz_val = self.get_val(x_minus)
 
             # 3. Применяем формулу центральных разностей
             g_vec[i] = (fy_val - fz_val) / (2 * delta)
         return g_vec
 
+    def calculate_hessian(self, x_vec: np.ndarray, delta: float = 1e-6) -> np.ndarray:
+        H = np.zeros((self.dim, self.dim))
+        fx = self.func(x_vec)  # f(x)
+        d2 = delta ** 2
+
+        # 1. Рассчитываем и сохраняем f(x + delta*e_i) для каждой оси
+        # Мы объединяем этот расчет с расчетом H_ii для оптимизации,
+        # чтобы не делать лишний цикл для H_ii.
+        f_plus_i = np.zeros(self.dim)
+        f_minus_i = np.zeros(self.dim)
+
+        # --- 1 & 2. Расчет и сохранение f(x +/- delta*e_i) и H_ii (Диагональные элементы) ---
+        for i in range(self.dim):
+            # 1a. f(x + delta*e_i)
+            x_plus_i = x_vec.copy()
+            x_plus_i[i] += delta
+            f_plus_i[i] = self.func(x_plus_i)  # Сохраняем f_plus_i[i] для H_ij
+
+            # 1b. f(x - delta*e_i)
+            x_minus_i = x_vec.copy()
+            x_minus_i[i] -= delta
+            f_minus_i_val = self.func(x_minus_i)
+
+            # 2. Расчет Диагонального элемента H_ii (ВНУТРИ ЦИКЛА)
+            # H_ii = (f(x + d*e_i) - 2*f(x) + f(x - d*e_i)) / d^2
+            H[i, i] = (f_plus_i[i] - 2 * fx + f_minus_i_val) / d2
+
+        # --- 3. Расчет Недиагональных элементов H_ij (Смешанные производные) ---
+        for i in range(self.dim):
+            # Начинаем со следующего элемента, чтобы не считать дважды (H_ij = H_ji)
+            for j in range(i + 1, self.dim):
+                # Вычисление f(x + delta*e_i + delta*e_j)
+                x_plus_ij = x_vec.copy()
+                x_plus_ij[i] += delta
+                x_plus_ij[j] += delta
+                f_plus_ij = self.func(x_plus_ij)
+
+                # Формула: (f(x+di+dj) - f(x+di) - f(x+dj) + f(x)) / d^2
+                Hij = (f_plus_ij - f_plus_i[i] - f_plus_i[j] + fx) / d2
+
+                H[i, j] = Hij
+                H[j, i] = Hij  # Симметричность
+        return H
+
+    def find_newton_direction(self, H: np.ndarray, g: np.ndarray) -> np.ndarray:
+        """
+        Решает СЛАУ H * d = -g для нахождения Ньютоновского направления d.
+        """
+        # 1. Проверяем, что матрица H не вырождена (обратима)
+        # Если определитель близок к нулю, матрица может быть сингулярной.
+        if np.linalg.det(H) == 0:
+            # В реальных методах оптимизации здесь часто переходят к методу
+            # наискорейшего спуска или используют квази-ньютоновские методы.
+            # В простейшем случае:
+            print("Warning: Hessian matrix is singular. Falling back to Steepest Descent.")
+            return -g  # Возвращаем антиградиент (направление Быстрого Спуска)
+
+        # 2. Правая часть уравнения (b) равна -g
+        b = -g
+
+        # 3. Решение СЛАУ H * d = b
+        # np.linalg.solve(A, b) решает A*x = b
+        d = np.linalg.solve(H, b)
+
+        return d
 
 if __name__ == "__main__":
     f = Koshi()
-    # res = f.quick_down((-2.8, 8), 0.0000001)
     # res = f.quick_down((20, 20), 0.0000001)
     # res = f.fl_rivs((20, 20), 0.0000001)
-    res = f.polocoribyer((20, 20), 0.0000001)
+    # res = f.polocoribyer((20, 20), 0.0000001)
+    # res = f.newthon((20, 20), 0.0000001)
 
+
+    res = f.quick_down((-2.8, 8), 0.0000001)
     # res = f.polocoribyer((-2.8, 8), 0.0000001)
     # res = f.fl_rivs((-2.8, 8), 0.0000001)
+    # res = f.newthon((-2.8, 8), 0.0000001)
+
 
     # print(res[0])
     # print(res[1])
